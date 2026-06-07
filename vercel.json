@@ -15,6 +15,18 @@
       "dest": "/public/storage/$1"
     },
     {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/sitemap.xml",
+      "dest": "/public/sitemap.xml"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
+    },
+    {
       "src": "/(.*)",
       "dest": "/api/index.php"
     }

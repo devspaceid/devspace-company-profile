@@ -83,13 +83,9 @@
                     @if($service->image)
     <div class="aspect-square w-20 flex items-center justify-center mb-6">
         <img
-            src="{{ asset('storage/' . $service->image) }}"
+            src="{{ $service->image_url }}"
             alt="{{ $service->title }}"
             class="max-w-full max-h-full object-contain">
-    </div>
-@else
-    <div class="w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center mb-6">
-        @include('frontend.partials.icon', ['icon' => $service->icon ?? 'code'])
     </div>
 @endif
                     <h3 class="text-xl font-semibold text-white mb-3">{{ $service->title }}</h3>

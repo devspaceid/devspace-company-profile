@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HeroSection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class HeroController extends Controller
 {
@@ -32,18 +33,46 @@ class HeroController extends Controller
         $hero = HeroSection::first() ?? new HeroSection();
 
         if ($request->hasFile('background_image')) {
-            if ($hero->background_image) {
-                Storage::disk('public')->delete($hero->background_image);
-            }
-            $validated['background_image'] = $request->file('background_image')->store('hero', 'public');
-        }
+
+    $file = $request->file('background_image');
+    $filename = uniqid().'_'.$file->getClientOriginalName();
+
+    Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer '.env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL').'/storage/v1/object/hero/'.$filename
+    );
+
+    $validated['background_image'] =
+        env('SUPABASE_URL').'/storage/v1/object/public/hero/'.$filename;
+}
 
         if ($request->hasFile('foreground_image')) {
-            if ($hero->foreground_image) {
-                Storage::disk('public')->delete($hero->foreground_image);
-            }
-            $validated['foreground_image'] = $request->file('foreground_image')->store('hero', 'public');
-        }
+
+    $file = $request->file('foreground_image');
+    $filename = uniqid().'_'.$file->getClientOriginalName();
+
+    Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer '.env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL').'/storage/v1/object/hero/'.$filename
+    );
+
+    $validated['foreground_image'] =
+        env('SUPABASE_URL').'/storage/v1/object/public/hero/'.$filename;
+}
 
         $validated['is_active'] = true;
         $hero->fill($validated);

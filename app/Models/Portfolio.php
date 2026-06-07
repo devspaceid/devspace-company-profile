@@ -56,9 +56,15 @@ class Portfolio extends Model
      * Get image URL
      */
     public function getImageUrlAttribute()
-    {
-        return $this->image ? asset('storage/' . $this->image) : null;
+{
+    if (!$this->image) {
+        return null;
     }
+
+    return str_starts_with($this->image, 'http')
+        ? $this->image
+        : asset('storage/' . $this->image);
+}
 
     /**
      * Get gallery URLs
@@ -67,8 +73,11 @@ class Portfolio extends Model
     {
         if (!$this->gallery)
             return [];
-        return array_map(fn($image) => asset('storage/' . $image), $this->gallery);
-    }
+        return array_map(function ($image) {
+    return str_starts_with($image, 'http')
+        ? $image
+        : asset('storage/' . $image);
+}, $this->gallery);
 
     /**
      * Get unique categories

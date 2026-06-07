@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class PortfolioController extends Controller
 {
@@ -37,8 +38,38 @@ class PortfolioController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('portfolio', 'public');
-        }
+
+    $file = $request->file('image');
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/portfolio/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['image'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/portfolio/'
+            . $fileName;
+
+    } else {
+
+        return back()->with(
+            'error',
+            'Upload gagal: ' . $response->body()
+        );
+
+    }
+}
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active', true);
@@ -70,11 +101,38 @@ class PortfolioController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($portfolio->image) {
-                Storage::disk('public')->delete($portfolio->image);
-            }
-            $validated['image'] = $request->file('image')->store('portfolio', 'public');
-        }
+
+    $file = $request->file('image');
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/portfolio/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['image'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/portfolio/'
+            . $fileName;
+
+    } else {
+
+        return back()->with(
+            'error',
+            'Upload gagal: ' . $response->body()
+        );
+
+    }
+}
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active');

@@ -35,15 +35,24 @@ class HeroSection extends Model
      * Get background image URL
      */
     public function getBackgroundImageUrlAttribute()
-    {
-        return $this->background_image ? asset('storage/' . $this->background_image) : null;
+{
+    if (!$this->background_image) {
+        return null;
     }
 
-    /**
-     * Get foreground image URL
-     */
-    public function getForegroundImageUrlAttribute()
-    {
-        return $this->foreground_image ? asset('storage/' . $this->foreground_image) : null;
+    return str_starts_with($this->background_image, 'http')
+        ? $this->background_image
+        : asset('storage/' . $this->background_image);
+}
+
+public function getForegroundImageUrlAttribute()
+{
+    if (!$this->foreground_image) {
+        return null;
     }
+
+    return str_starts_with($this->foreground_image, 'http')
+        ? $this->foreground_image
+        : asset('storage/' . $this->foreground_image);
+}
 }

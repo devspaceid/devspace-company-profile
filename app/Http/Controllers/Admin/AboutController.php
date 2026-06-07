@@ -41,10 +41,11 @@ class AboutController extends Controller
     $fileName = uniqid() . '_' . $file->getClientOriginalName();
 
     $response = Http::withHeaders([
-        'apikey' => env('SUPABASE_KEY'),
-        'Authorization' => 'Bearer ' . env('SUPABASE_KEY'),
-        'Content-Type' => $file->getMimeType(),
-    ])->withBody(
+    'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+    'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+    'x-upsert' => 'true',
+    'Content-Type' => $file->getMimeType(),
+])->withBody(
         file_get_contents($file->getRealPath()),
         $file->getMimeType()
     )->post(
@@ -60,7 +61,10 @@ class AboutController extends Controller
 
     } else {
 
-        return back()->with('error', 'Upload ke Supabase gagal');
+        return back()->with(
+    'error',
+    'Upload gagal: ' . $response->body()
+);
 
     }
 }

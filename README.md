@@ -77,4 +77,4 @@ To become a leading technology partner in digital innovation, cybersecurity, and
 
 ---
 
-Developed and maintained by **DevSpace**.
+Developed and maintained by **@Ramdhanisheva**.

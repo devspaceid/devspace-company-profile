@@ -45,10 +45,16 @@ class TeamMember extends Model
     /**
      * Get photo URL
      */
-    public function getPhotoUrlAttribute()
-    {
-        return $this->photo ? asset('storage/' . $this->photo) : null;
+   public function getPhotoUrlAttribute()
+{
+    if (!$this->photo) {
+        return null;
     }
+
+    return str_starts_with($this->photo, 'http')
+        ? $this->photo
+        : asset('storage/' . $this->photo);
+}
 
     /**
      * Check if member has any social links

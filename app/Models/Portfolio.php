@@ -78,6 +78,7 @@ class Portfolio extends Model
         ? $image
         : asset('storage/' . $image);
 }, $this->gallery);
+    }
 
     /**
      * Get unique categories

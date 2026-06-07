@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class TestimonialController extends Controller
 {
@@ -35,8 +36,38 @@ class TestimonialController extends Controller
         ]);
 
         if ($request->hasFile('client_photo')) {
-            $validated['client_photo'] = $request->file('client_photo')->store('testimonials', 'public');
-        }
+
+    $file = $request->file('client_photo');
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/testimonials/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['client_photo'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/testimonials/'
+            . $fileName;
+
+    } else {
+
+        return back()->with(
+            'error',
+            'Upload gagal: ' . $response->body()
+        );
+
+    }
+}
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active', true);
@@ -66,11 +97,38 @@ class TestimonialController extends Controller
         ]);
 
         if ($request->hasFile('client_photo')) {
-            if ($testimonial->client_photo) {
-                Storage::disk('public')->delete($testimonial->client_photo);
-            }
-            $validated['client_photo'] = $request->file('client_photo')->store('testimonials', 'public');
-        }
+
+    $file = $request->file('client_photo');
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/testimonials/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['client_photo'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/testimonials/'
+            . $fileName;
+
+    } else {
+
+        return back()->with(
+            'error',
+            'Upload gagal: ' . $response->body()
+        );
+
+    }
+}
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active');

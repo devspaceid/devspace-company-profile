@@ -53,9 +53,15 @@ class Testimonial extends Model
      * Get client photo URL
      */
     public function getClientPhotoUrlAttribute()
-    {
-        return $this->client_photo ? asset('storage/' . $this->client_photo) : null;
+{
+    if (!$this->client_photo) {
+        return null;
     }
+
+    return str_starts_with($this->client_photo, 'http')
+        ? $this->client_photo
+        : asset('storage/' . $this->client_photo);
+}
 
     /**
      * Get star rating as array for display

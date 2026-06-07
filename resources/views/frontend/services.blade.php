@@ -27,7 +27,7 @@
                        @if($service->image)
     <div class="w-16 h-16 rounded-2xl overflow-hidden mb-6">
         <img
-            src="{{ asset('storage/' . $service->image) }}"
+            src="{{ $service->image_url }}"
             alt="{{ $service->title }}"
             class="w-full h-full object-cover">
     </div>

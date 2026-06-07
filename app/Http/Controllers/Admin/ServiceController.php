@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class ServiceController extends Controller
 {
@@ -35,8 +36,38 @@ class ServiceController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('services', 'public');
-        }
+
+    $file = $request->file('image');
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/services/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['image'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/services/'
+            . $fileName;
+
+    } else {
+
+        return back()->with(
+            'error',
+            'Upload gagal: ' . $response->body()
+        );
+
+    }
+}
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active', true);
@@ -66,11 +97,38 @@ class ServiceController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($service->image) {
-                Storage::disk('public')->delete($service->image);
-            }
-            $validated['image'] = $request->file('image')->store('services', 'public');
-        }
+
+    $file = $request->file('image');
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/services/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['image'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/services/'
+            . $fileName;
+
+    } else {
+
+        return back()->with(
+            'error',
+            'Upload gagal: ' . $response->body()
+        );
+
+    }
+}
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active');

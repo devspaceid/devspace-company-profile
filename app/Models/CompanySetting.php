@@ -38,15 +38,24 @@ class CompanySetting extends Model
      * Get logo URL
      */
     public function getLogoUrlAttribute()
-    {
-        return $this->logo ? asset('storage/' . $this->logo) : null;
+{
+    if (!$this->logo) {
+        return null;
     }
 
-    /**
-     * Get favicon URL
-     */
-    public function getFaviconUrlAttribute()
-    {
-        return $this->favicon ? asset('storage/' . $this->favicon) : null;
+    return str_starts_with($this->logo, 'http')
+        ? $this->logo
+        : asset('storage/' . $this->logo);
+}
+
+public function getFaviconUrlAttribute()
+{
+    if (!$this->favicon) {
+        return null;
     }
+
+    return str_starts_with($this->favicon, 'http')
+        ? $this->favicon
+        : asset('storage/' . $this->favicon);
+}
 }

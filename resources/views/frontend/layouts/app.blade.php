@@ -2,16 +2,65 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+      <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{{ $settings->description ?? 'Company Profile' }}">
-    <title>@yield('title', $settings->company_name ?? config('app.name'))</title>
+
+    <title>@yield('title', 'DevSpace Indonesia | Web Development, AI & Cyber Security')</title>
+
+    <meta name="description"
+        content="{{ $settings->description ?? 'DevSpace Indonesia menyediakan layanan Web Development, Artificial Intelligence, Cyber Security, Software Development, dan Digital Solutions.' }}">
+
+    <meta name="keywords"
+        content="DevSpace, Web Development Indonesia, Jasa Pembuatan Website, Artificial Intelligence, Cyber Security">
+
+    <meta name="author"
+        content="DevSpace Indonesia">
+
+    <meta name="robots"
+        content="index, follow">
+
+    <link rel="canonical"
+        href="{{ url()->current() }}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ $settings->company_name ?? 'DevSpace Indonesia' }}">
+    <meta property="og:title" content="@yield('title', 'DevSpace Indonesia')">
+    <meta property="og:description" content="{{ $settings->description }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="{{ $settings->logo_url }}">
+    <meta property="og:image:alt" content="{{ $settings->company_name }}">
+    <meta property="og:locale" content="id_ID">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'DevSpace Indonesia')">
+    <meta name="twitter:description" content="{{ $settings->description }}">
+    <meta name="twitter:image" content="{{ $settings->logo_url }}">
 
     @if($settings->favicon_url ?? false)
         <link rel="icon" href="{{ $settings->favicon_url }}" type="image/x-icon">
     @endif
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Organization",
+  "name":"{{ $settings->company_name ?? 'DevSpace Indonesia' }}",
+  "url":"{{ url('/') }}",
+  "logo":"{{ $settings->logo_url }}",
+  "description":"{{ $settings->description }}",
+  "email":"{{ $settings->email }}",
+  "telephone":"{{ $settings->phone }}",
+  "address":"{{ $settings->address }}",
+  "sameAs":[
+    "{{ $settings->facebook }}",
+    "{{ $settings->instagram }}",
+    "{{ $settings->linkedin }}",
+    "{{ $settings->youtube }}"
+  ]
+}
+</script>
 </head>
 
 <body class="min-h-screen flex flex-col overflow-x-hidden" style="background-color: #0f0f23;">

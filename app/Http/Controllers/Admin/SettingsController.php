@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CompanySetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class SettingsController extends Controller
 {
@@ -38,19 +39,71 @@ class SettingsController extends Controller
 
         // Handle logo upload
         if ($request->hasFile('logo')) {
-            if ($settings->logo) {
-                Storage::disk('public')->delete($settings->logo);
-            }
-            $validated['logo'] = $request->file('logo')->store('settings', 'public');
-        }
+
+    $file = $request->file('logo');
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/settings/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['logo'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/settings/'
+            . $fileName;
+
+    } else {
+
+        return back()->with(
+            'error',
+            'Upload logo gagal: ' . $response->body()
+        );
+    }
+}
 
         // Handle favicon upload
         if ($request->hasFile('favicon')) {
-            if ($settings->favicon) {
-                Storage::disk('public')->delete($settings->favicon);
-            }
-            $validated['favicon'] = $request->file('favicon')->store('settings', 'public');
-        }
+
+    $file = $request->file('favicon');
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_SERVICE_ROLE_KEY'),
+        'x-upsert' => 'true',
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/settings/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['favicon'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/settings/'
+            . $fileName;
+
+    } else {
+
+        return back()->with(
+            'error',
+            'Upload favicon gagal: ' . $response->body()
+        );
+    }
+}
 
         $settings->fill($validated);
         $settings->save();

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AboutSection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class AboutController extends Controller
 {
@@ -34,11 +35,35 @@ class AboutController extends Controller
         $about = AboutSection::first() ?? new AboutSection();
 
         if ($request->hasFile('image')) {
-            if ($about->image) {
-                Storage::disk('public')->delete($about->image);
-            }
-            $validated['image'] = $request->file('image')->store('about', 'public');
-        }
+
+    $file = $request->file('image');
+
+    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+    $response = Http::withHeaders([
+        'apikey' => env('SUPABASE_KEY'),
+        'Authorization' => 'Bearer ' . env('SUPABASE_KEY'),
+        'Content-Type' => $file->getMimeType(),
+    ])->withBody(
+        file_get_contents($file->getRealPath()),
+        $file->getMimeType()
+    )->post(
+        env('SUPABASE_URL') . '/storage/v1/object/about/' . $fileName
+    );
+
+    if ($response->successful()) {
+
+        $validated['image'] =
+            env('SUPABASE_URL')
+            . '/storage/v1/object/public/about/'
+            . $fileName;
+
+    } else {
+
+        return back()->with('error', 'Upload ke Supabase gagal');
+
+    }
+}
 
         $validated['is_active'] = true;
         $about->fill($validated);

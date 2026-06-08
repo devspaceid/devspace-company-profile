@@ -42,25 +42,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <script type="application/ld+json">
-{
-  "@context":"https://schema.org",
-  "@type":"Organization",
-  "name":"{{ $settings->company_name ?? 'DevSpace Indonesia' }}",
-  "url":"{{ url('/') }}",
-  "logo":"{{ $settings->logo_url }}",
-  "description":"{{ $settings->description }}",
-  "email":"{{ $settings->email }}",
-  "telephone":"{{ $settings->phone }}",
-  "address":"{{ $settings->address }}",
-  "sameAs":[
-    "{{ $settings->facebook }}",
-    "{{ $settings->instagram }}",
-    "{{ $settings->linkedin }}",
-    "{{ $settings->youtube }}"
-  ]
-}
-</script>
+    
 </head>
 
 <body class="min-h-screen flex flex-col overflow-x-hidden" style="background-color: #0f0f23;">

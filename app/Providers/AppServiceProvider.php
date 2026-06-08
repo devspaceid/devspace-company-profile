@@ -2,10 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\CompanySetting;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,10 +17,5 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
-
-        View::share(
-            'settings',
-            CompanySetting::getSettings()
-        );
     }
 }
